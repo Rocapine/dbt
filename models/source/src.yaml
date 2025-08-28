@@ -1,0 +1,10 @@
+version: 2
+
+sources:
+  - name: raw            
+    database: rocadata 
+    schema: Revenue    
+    tables:
+      - name: RevenueCatHarmonyTer
+      - name: RevenueCatUnchaind
+      
