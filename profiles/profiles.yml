@@ -3,12 +3,12 @@ datawarehouse:
   outputs:
     prod:
       type: bigquery
-      method: service-account-json
+      method: service-account
       project: "{{ env_var('BIGQUERY_PROJECT') }}"
       dataset: "{{ env_var('BIGQUERY_DATASET') }}"
       location: europe-west9
       threads: 4
       timeout_seconds: 300
       priority: interactive
-      keyfile_json: "{{ env_var('BIGQUERY_SERVICE_ACCOUNT_JSON') | fromjson }}"
+      keyfile: "{{ env_var('BIGQUERY_KEYFILE', '/tmp/bq_key.json') }}"
 
