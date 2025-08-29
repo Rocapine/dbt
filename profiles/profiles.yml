@@ -10,5 +10,5 @@ datawarehouse:
       threads: 4
       timeout_seconds: 300
       priority: interactive
-      keyfile: "{{ env_var('BIGQUERY_KEYFILE', '/tmp/bq_key.json') }}"
+      keyfile: "{{ fromjson(env_var('BIGQUERY_SERVICE_ACCOUNT_JSON')) }}"
 
