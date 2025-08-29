@@ -1,12 +1,12 @@
 datawarehouse:
-  target: "{{ env_var('DBT_TARGET', 'prod') }}"
+  target: prod
   outputs:
     prod:
       type: bigquery
       method: service-account-json
       project: "{{ env_var('BIGQUERY_PROJECT') }}"
       dataset: "{{ env_var('BIGQUERY_DATASET') }}"
-      location: "{{ env_var('BIGQUERY_LOCATION', 'US') }}"
+      location: europe-west9
       threads: 4
       timeout_seconds: 300
       priority: interactive
