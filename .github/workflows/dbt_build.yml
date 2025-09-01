@@ -24,6 +24,11 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+      
+        
+      - name: Set up big query credentials
+        run: |
+          echo "${{ secrets.BIGQUERY_SERVICE_ACCOUNT_JSON }}" > ~/credentials.json
 
       - name: Set up Python
         uses: actions/setup-python@v5
