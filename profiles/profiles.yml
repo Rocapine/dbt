@@ -1,14 +1,15 @@
 datawarehouse:
-  target: prod
+  target: dev
   outputs:
-    prod:
-      type: bigquery
-      method: service-account
-      project: "{{ env_var('BIGQUERY_PROJECT') }}"
+    dev:
       dataset: "{{ env_var('BIGQUERY_DATASET') }}"
-      location: europe-west9
-      threads: 4
-      timeout_seconds: 300
-      priority: interactive
+      job_execution_timeout_seconds: 300
+      job_retries: 1
       keyfile: "{{ fromjson(env_var('BIGQUERY_SERVICE_ACCOUNT_JSON')) }}"
+      location: europe-west9
+      method: service-account
+      priority: interactive
+      project: "{{ env_var('BIGQUERY_PROJECT') }}"
+      threads: 4
+      type: bigquery
 
