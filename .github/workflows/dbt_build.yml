@@ -16,7 +16,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      DBT_PROFILES_DIR: ${{ github.workspace }}/datawarehouse/profiles
+      DBT_PROFILES_DIR: ${{ github.workspace }}/profiles
       BIGQUERY_PROJECT: ${{ secrets.BIGQUERY_PROJECT }}
       BIGQUERY_DATASET: ${{ secrets.BIGQUERY_DATASET }}
       BIGQUERY_SERVICE_ACCOUNT_JSON: ${{ secrets.BIGQUERY_SERVICE_ACCOUNT_JSON }}
@@ -39,7 +39,6 @@ jobs:
         run: dbt --version
 
       - name: Run dbt build
-        working-directory: datawarehouse
         run: dbt build
 
       - name: Upload dbt logs
