@@ -5,7 +5,7 @@ datawarehouse:
       dataset: "{{ env_var('BIGQUERY_DATASET') }}"
       job_execution_timeout_seconds: 300
       job_retries: 1
-      keyfile: "{{ fromjson(env_var('BIGQUERY_SERVICE_ACCOUNT_JSON')) }}"
+      keyfile_json: "{{ fromjson(env_var('BIGQUERY_SERVICE_ACCOUNT_JSON')) }}"
       location: europe-west9
       method: service-account
       priority: interactive
