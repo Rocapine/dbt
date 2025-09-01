@@ -38,6 +38,7 @@ jobs:
       
       - name: Set up big query credentials
         run: |
+          mkdir -p ~/.dbt
           echo "${{ secrets.DBT_PROFILES}}" > ~/.dbt/profiles.yml
 
       - name: Run dbt build
