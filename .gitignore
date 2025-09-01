@@ -3,3 +3,5 @@ target/
 dbt_packages/
 logs/
 credentials.json
+profiles/profiles.yml
+

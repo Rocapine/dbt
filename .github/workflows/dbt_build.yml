@@ -41,8 +41,7 @@ jobs:
       
       - name: Set up big query credentials
         run: |
-          echo "${{ secrets.BIGQUERY_SERVICE_ACCOUNT_JSON }}" > ./credentials.json
-          cat ./credentials.json
+          echo "${{ secrets.DBT_PROFILES}}" > ./profiles/profiles.yml
 
       - name: Run dbt build
         run: dbt build
