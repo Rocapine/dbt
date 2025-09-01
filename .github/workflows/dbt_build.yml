@@ -38,7 +38,7 @@ jobs:
       
       - name: Set up big query credentials
         run: |
-          echo "${{ secrets.DBT_PROFILES}}" > ./profiles/profiles.yml
+          echo "${{ secrets.DBT_PROFILES}}" > ~/.dbt/profiles.yml
 
       - name: Run dbt build
         run: dbt build
