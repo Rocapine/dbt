@@ -16,10 +16,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      DBT_PROFILES_DIR: ${{ github.workspace }}/profiles
-      BIGQUERY_PROJECT: ${{ secrets.BIGQUERY_PROJECT }}
-      BIGQUERY_DATASET: ${{ secrets.BIGQUERY_DATASET }}
-      BIGQUERY_SERVICE_ACCOUNT_JSON: ${{ secrets.BIGQUERY_SERVICE_ACCOUNT_JSON }}
+      DBT_PROFILES: ${{ secrets.DBT_PROFILES }}
 
     steps:
       - name: Checkout repository
