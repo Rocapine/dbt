@@ -16,7 +16,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      DBT_PROFILES: ${{ secrets.DBT_PROFILES }}
+      GCP_PRIVATE_KEY_ID: ${{ secrets.GCP_PRIVATE_KEY_ID }}
+      GCP_PRIVATE_KEY: ${{ secrets.GCP_PRIVATE_KEY }}
 
     steps:
       - name: Checkout repository
