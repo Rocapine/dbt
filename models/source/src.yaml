@@ -5,6 +5,6 @@ sources:
     database: rocadata 
     schema: Revenue    
     tables:
-      - name: RevenueCatHarmonyTer
+      - name: RevenueCatHarmony
       - name: RevenueCatUnchained
       
