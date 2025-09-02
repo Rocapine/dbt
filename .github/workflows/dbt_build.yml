@@ -2,7 +2,7 @@ name: Daily dbt Build
 
 on:
   schedule:
-    - cron: '0 4 * * *'   # 4am UTC which is 6am in Paris
+    - cron: "0 4 * * *" # 4am UTC which is 6am in Paris
   workflow_dispatch: {}
 
 permissions:
@@ -21,12 +21,11 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      
-        
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: "3.11"
 
       - name: Install dbt (BigQuery adapter)
         run: |
@@ -35,15 +34,9 @@ jobs:
 
       - name: Show dbt version
         run: dbt --version
-      
-      - name: Set up big query credentials
-        run: |
-          mkdir -p ~/.dbt
-          echo "${{ secrets.DBT_PROFILES}}" > ~/.dbt/profiles.yml
-          cat ~/.dbt/profiles.yml
 
       - name: Run dbt build
-        run: dbt build
+        run: dbt build --profiles-dir ./profiles
 
       - name: Upload dbt logs
         if: always()
@@ -56,5 +49,3 @@ jobs:
           if-no-files-found: ignore
 
     timeout-minutes: 60
-
-
