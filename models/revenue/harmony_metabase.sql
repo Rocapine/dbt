@@ -16,7 +16,14 @@ trials as (
     and source.is_sandbox = false
     and coalesce(source.ownership_type, 'PURCHASED') <> 'FAMILY_SHARED'
 ),
-converted as (
+converted_revenuecat as (
+  select distinct source.rc_original_app_user_id
+  from source
+  join trials as tr using (rc_original_app_user_id)
+  WHERE source.is_trial_conversion = TRUE
+  AND source.refunded_at IS NULL  
+),
+converted_rocapine as (
   select distinct source.rc_original_app_user_id
   from source
   join trials as tr using (rc_original_app_user_id)
@@ -43,7 +50,8 @@ select
   any_value(b.platform) as platform,
   max(b.refunded_at) as has_refunded,
   max(case when tr.rc_original_app_user_id is not null then true else false end) as has_started_trial,
-  max(case when converted.rc_original_app_user_id is not null then true else false end) as has_converted_trial,
+  max(case when converted_revenuecat.rc_original_app_user_id is not null then true else false end) as has_converted_trial_revenuecat,
+  max(case when converted_rocapine.rc_original_app_user_id is not null then true else false end) as has_converted_trial_rocapine,
   any_value(b.product_identifier) as product_id,
   max(b.purchase_price_in_usd) as purchased_price_usd,
   case
@@ -53,5 +61,6 @@ select
   end as region
 from base b
 left join trials tr on tr.rc_original_app_user_id = b.rc_original_app_user_id
-left join converted on converted.rc_original_app_user_id = b.rc_original_app_user_id
+left join converted_revenuecat on converted_revenuecat.rc_original_app_user_id = b.rc_original_app_user_id
+left join converted_rocapine on converted_rocapine.rc_original_app_user_id = b.rc_original_app_user_id
 group by b.rc_original_app_user_id
