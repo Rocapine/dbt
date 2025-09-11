@@ -7,4 +7,5 @@ sources:
     tables:
       - name: RevenueCatHarmony
       - name: RevenueCatUnchained
+      - name: Products
       
