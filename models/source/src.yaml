@@ -8,4 +8,6 @@ sources:
       - name: RevenueCatHarmony
       - name: RevenueCatUnchained
       - name: Products
+      - name: QonversionStashcookAndroid
+      - name: QonversionStashcookIOS
       
