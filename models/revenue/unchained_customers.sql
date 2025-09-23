@@ -71,7 +71,7 @@ select
   any_value(products.expected_proceeds_in_usd) as expected_proceeds_in_usd,
   any_value(products.duration) as duration,
   case
-    when lower(any_value(base.country)) in ('al','at','by','be','ba','bg','hr','cz','dk','de','ee','fi','gr','hu','is','ie','it','lt','lv','lu','mk','mt','md','nl','no','pl','pt','ro','ru','rs','sk','si','es','se','ch','tr','ua','cy') then 'EUROPE'
+    when lower(any_value(base.country)) in ('ad','al','at','by','be','ba','bg','hr','cz','dk','de','ee','fi','gr','fr','gb','hu','is','ie','it','lt','lv','lu','mk','mt','md','nl','no','pl','pt','ro','ru','rs','sk','si','es','se','ch','tr','ua','cy') then 'EUROPE'
     when lower(any_value(base.country)) in ('us','ca') then 'US/CA'
     else 'Rest of The world'
   end as region
