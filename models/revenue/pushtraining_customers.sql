@@ -39,7 +39,8 @@ base as (
     platform,
     product_identifier,
     purchase_price_in_usd,
-    refunded_at
+    refunded_at,
+    start_time
   from source
 ),
 products as (
@@ -63,7 +64,7 @@ select
   max(case when tr.rc_original_app_user_id is not null then true else false end) as has_started_trial,
   max(case when converted_revenuecat.rc_original_app_user_id is not null then true else false end) as has_converted_trial_revenuecat,
   max(case when converted_rocapine.rc_original_app_user_id is not null then true else false end) as has_converted_trial_rocapine,
-  any_value(base.product_identifier) as product_id,
+  ARRAY_AGG(base.product_identifier ORDER BY base.start_time DESC LIMIT 1)[OFFSET(0)] as product_id,
   max(base.purchase_price_in_usd) as purchased_price_usd,
   any_value(products.customer_price_in_currency) as customer_price_in_currency,
   any_value(products.customer_price_in_usd) as customer_price_in_usd,
