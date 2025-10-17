@@ -2,7 +2,7 @@ datawarehouse:
   target: dev
   outputs:
     dev:
-      dataset: Revenue
+      dataset: Prod
       job_execution_timeout_seconds: 300
       job_retries: 1
       location: europe-west9

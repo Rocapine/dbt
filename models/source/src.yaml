@@ -11,4 +11,14 @@ sources:
       - name: QonversionStashcookAndroid
       - name: QonversionStashcookIOS
       - name: RevenueCatPushtraining
+  - name: asc
+    database: rocadata
+    schema: AppStoreConnect
+    tables:
+      - name: Notification
+  - name: core
+    database: rocadata
+    schema: Staging_Core
+    tables:
+      - name: Products
       
