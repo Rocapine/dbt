@@ -21,4 +21,9 @@ sources:
     schema: Staging_Core
     tables:
       - name: Products
+  - name: googleplay
+    database: rocadata
+    schema: GooglePlay
+    tables:
+      - name: Notification
       
