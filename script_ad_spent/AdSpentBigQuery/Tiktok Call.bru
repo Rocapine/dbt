@@ -1,0 +1,34 @@
+meta {
+  name: Tiktok Call
+  type: http
+  seq: 1
+}
+
+get {
+  url: https://business-api.tiktok.com/open_api/v1.3/report/integrated/get/
+  body: json
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/json
+  Access-Token: 57ce2e64ea07ecb03836462d8322714ba925b523
+}
+
+body:json {
+  {
+    "advertiser_id": "7491295961961414673",
+    "start_date": "2025-09-01",
+    "end_date": "2025-09-30",
+    "metrics": ["spend","currency"],
+    "report_type": "BASIC",
+    "data_level": "AUCTION_ADGROUP",
+    "dimensions": ["stat_time_day", "country_code", "adgroup_id"],
+    "page": 1,
+    "page_size": 1000
+  }
+}
+
+settings {
+  encodeUrl: true
+}

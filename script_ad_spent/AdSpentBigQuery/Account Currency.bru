@@ -1,0 +1,23 @@
+meta {
+  name: Account Currency
+  type: http
+  seq: 6
+}
+
+get {
+  url: https://graph.facebook.com/v23.0/act_321196155963222
+  ?fields=account_id,account_name,currency
+  &access_token=YOUR_TOKEN
+  body: none
+  auth: inherit
+}
+
+params:query {
+  fields: account_id,account_name,currency
+    
+  access_token: YOUR_TOKEN
+}
+
+settings {
+  encodeUrl: true
+}

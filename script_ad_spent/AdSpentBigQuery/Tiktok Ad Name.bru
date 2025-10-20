@@ -1,0 +1,36 @@
+meta {
+  name: Tiktok Ad Name
+  type: http
+  seq: 5
+}
+
+get {
+  url: https://business-api.tiktok.com/open_api/v1.3/adgroup/get/
+  body: json
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/json
+  Access-Token: 57ce2e64ea07ecb03836462d8322714ba925b523
+}
+
+body:json {
+  {
+    "advertiser_id": "7540238271947849729",
+    "filtering": { "ad_ids": ["1841526567361602"] },
+    "fields": [
+      "ad_id","ad_name",
+      "operation_status","secondary_status",
+      "adgroup_id","adgroup_name",
+      "campaign_id","campaign_name",
+      "modify_time","create_time"
+    ],
+    "page": 1,
+    "page_size": 1000
+  }
+}
+
+settings {
+  encodeUrl: true
+}

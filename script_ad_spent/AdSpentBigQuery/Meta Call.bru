@@ -1,0 +1,25 @@
+meta {
+  name: Meta Call
+  type: http
+  seq: 2
+}
+
+get {
+  url: https://graph.facebook.com/v23.0/act_321196155963222/insights?time_range[since]=2025-07-01&time_range[until]=2025-08-01&access_token=EAAUKh5VZA6xgBPl45ALNAMJdMoX53w4tW60i2FwCnE2A20YmlD4ruuvJnuhM76rkvi8MyBDivE57v52guCZCvBqnpZAfZBO249wOoOAIlgqgpFtMlZBBuu3gow126AreW2s1wwOhMQYyCwqrMh0nDkavdlEqK60neojGc1I9AGxdbitwTyHkYlzxngTZCP&fields=adset_name,adset_id,campaign_id,campaign_name,spend,date_start,date_stop&breakdowns=country&time_increment=1&level=adset
+  body: none
+  auth: inherit
+}
+
+params:query {
+  time_range[since]: 2025-07-01
+  time_range[until]: 2025-08-01
+  access_token: EAAUKh5VZA6xgBPl45ALNAMJdMoX53w4tW60i2FwCnE2A20YmlD4ruuvJnuhM76rkvi8MyBDivE57v52guCZCvBqnpZAfZBO249wOoOAIlgqgpFtMlZBBuu3gow126AreW2s1wwOhMQYyCwqrMh0nDkavdlEqK60neojGc1I9AGxdbitwTyHkYlzxngTZCP
+  fields: adset_name,adset_id,campaign_id,campaign_name,spend,date_start,date_stop
+  breakdowns: country
+  time_increment: 1
+  level: adset
+}
+
+settings {
+  encodeUrl: true
+}
