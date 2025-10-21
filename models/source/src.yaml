@@ -26,4 +26,12 @@ sources:
     schema: GooglePlay
     tables:
       - name: Notification
+  - name: ads 
+    database: rocadata
+    schema: AdSpend
+    tables:
+      - name: AsaAds
+      - name: MetaAds
+      - name: TiktokAds
+
       
