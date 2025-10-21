@@ -1,3 +1,4 @@
 AdSpenttoBigQuery_credentials.json
-
 .env 
+private-key.pem
+public-key.pem

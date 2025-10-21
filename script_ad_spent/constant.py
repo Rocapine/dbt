@@ -22,8 +22,17 @@ HISTORICAL_META_IDS = {
     "Lifestyle Web": "1440546603639114"
 }
 
+# Apple Search Ads Organization IDs (orgId) per app/business label
+HISTORICAL_ASA_ORG_IDS = {
+    "Rocapine": "8491020",
+}
+
 NEW_AD_ACCOUNT_TIKTOK_IDS = {
 }
 
 NEW_AD_ACCOUNT_META_IDS = {
+}
+
+# New or temporary Apple Search Ads org IDs can be put here when backfilling
+NEW_AD_ACCOUNT_ASA_ORG_IDS = {
 }

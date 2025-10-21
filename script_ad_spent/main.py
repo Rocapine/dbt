@@ -4,10 +4,19 @@ import csv
 from typing import List, Optional
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
-from constant import HISTORICAL_TIKTOK_IDS, HISTORICAL_META_IDS, NEW_AD_ACCOUNT_TIKTOK_IDS, NEW_AD_ACCOUNT_META_IDS
+from constant import (
+    HISTORICAL_TIKTOK_IDS,
+    HISTORICAL_META_IDS,
+    NEW_AD_ACCOUNT_TIKTOK_IDS,
+    NEW_AD_ACCOUNT_META_IDS,
+    HISTORICAL_ASA_ORG_IDS,
+    NEW_AD_ACCOUNT_ASA_ORG_IDS,
+)
 from tiktok_service import fetch_daily_spend_by_country_by_adgroup as tiktok_spend_by_country_by_adgroup
 from meta_service import fetch_daily_spend_by_country as meta_spend_by_country
+from asa_service import fetch_daily_spend_by_country_by_adgroup as asa_spend_by_country_by_adgroup
 from bq_writer import write_rows_to_bigquery
+from datetime import timezone
 
 
 def main(argv: List[str]) -> int:
@@ -16,6 +25,7 @@ def main(argv: List[str]) -> int:
     args = argv[1:]
     TIKTOK_IDS = HISTORICAL_TIKTOK_IDS
     META_IDS = HISTORICAL_META_IDS
+    ASA_IDS = HISTORICAL_ASA_ORG_IDS
 
     # parsed date args
     start_date_arg: Optional[str] = None
@@ -24,6 +34,7 @@ def main(argv: List[str]) -> int:
     # flags
     to_bq = False
     use_meta = False
+    use_asa = False
     bq_dataset = os.getenv("BQ_DATASET")
     bq_table = os.getenv("BQ_TIKTOK_TABLE")
     bq_project = os.getenv("BQ_PROJECT")
@@ -36,10 +47,15 @@ def main(argv: List[str]) -> int:
         args = [a for a in args if a != "--new-ad-account"]
         TIKTOK_IDS = NEW_AD_ACCOUNT_TIKTOK_IDS
         META_IDS = NEW_AD_ACCOUNT_META_IDS
+        ASA_IDS = NEW_AD_ACCOUNT_ASA_ORG_IDS
     if "--meta" in args:
         use_meta = True
         args = [a for a in args if a != "--meta"]
         bq_table = os.getenv("BQ_META_TABLE")
+    if "--asa" in args:
+        use_asa = True
+        args = [a for a in args if a != "--asa"]
+        bq_table = os.getenv("BQ_ASA_TABLE")
     # Parse positional args for date range
     def is_yyyy_mm_dd(s: str) -> bool:
         try:
@@ -54,18 +70,20 @@ def main(argv: List[str]) -> int:
         parsed_apps_start_idx = 2
     else:
         # Default to yesterday (UTC) when dates are not supplied
-        yesterday = (datetime.utcnow() - timedelta(days=1)).strftime("%Y-%m-%d")
+        yesterday = (datetime.now(timezone.utc) - timedelta(days=1)).strftime("%Y-%m-%d")
         start_date_arg = yesterday
         end_date_arg = yesterday
 
     # support selecting specific apps via CLI args after date inputs
-    default_app_ids = META_IDS if use_meta else TIKTOK_IDS
+    default_app_ids = META_IDS if use_meta else (ASA_IDS if use_asa else TIKTOK_IDS)
     selected_apps = set(args[parsed_apps_start_idx:]) if len(args) > parsed_apps_start_idx else set(default_app_ids.keys())
 
     def advertiser_ids_for_app(app: str) -> List[str]:
-        if not use_meta:
-            return [TIKTOK_IDS.get(app, "")]
-        return [META_IDS.get(app, "")]
+        if use_meta:
+            return [META_IDS.get(app, "")]
+        if use_asa:
+            return [ASA_IDS.get(app, "")]
+        return [TIKTOK_IDS.get(app, "")]
 
     writer = None if to_bq else csv.writer(sys.stdout)
     if writer:
@@ -83,9 +101,12 @@ def main(argv: List[str]) -> int:
 
     for app in sorted(selected_apps):
         ids = advertiser_ids_for_app(app)
-        rows_country = (
-            meta_spend_by_country if use_meta else tiktok_spend_by_country_by_adgroup
-        )(ids, start_date_str=start_date_arg, end_date_str=end_date_arg)
+        if use_meta:
+            rows_country = meta_spend_by_country(ids, start_date_str=start_date_arg, end_date_str=end_date_arg)
+        elif use_asa:
+            rows_country = asa_spend_by_country_by_adgroup(ids, start_date_str=start_date_arg, end_date_str=end_date_arg)
+        else:
+            rows_country = tiktok_spend_by_country_by_adgroup(ids, start_date_str=start_date_arg, end_date_str=end_date_arg)
         if to_bq:
             # stream to BigQuery
             rows = (
