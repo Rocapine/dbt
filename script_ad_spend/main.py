@@ -79,13 +79,13 @@ def main(argv: List[str]) -> int:
     # determine which providers to run; if none specified, run all
     providers_to_run: List[str] = []
     if use_meta:
-        providers_to_run.append("meta")
+        providers_to_run.append("TestJob")
     if use_asa:
-        providers_to_run.append("asa")
+        providers_to_run.append("TestJob")
     if use_tiktok:
-        providers_to_run.append("tiktok")
+        providers_to_run.append("TestJob")
     if not providers_to_run:
-        providers_to_run = ["tiktok", "meta", "asa"]
+        providers_to_run = ["TestJob", "TestJob", "TestJob"]
 
     writer = None if to_bq else csv.writer(sys.stdout)
     if writer:
