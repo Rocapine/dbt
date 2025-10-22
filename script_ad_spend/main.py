@@ -35,9 +35,8 @@ def main(argv: List[str]) -> int:
     use_meta = False
     use_asa = False
     use_tiktok = False
-    bq_dataset = os.getenv("BQ_DATASET")
-    bq_table = os.getenv("BQ_TIKTOK_TABLE")
-    bq_project = os.getenv("BQ_PROJECT")
+    bq_dataset = "AdSpend"
+    bq_project = "rocadata"
     bq_credentials = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
 
     if "--to-bq" in args:
@@ -106,13 +105,13 @@ def main(argv: List[str]) -> int:
     for provider in providers_to_run:
         if provider == "meta":
             ids_map = META_IDS
-            table_for_provider = os.getenv("BQ_META_TABLE")
+            table_for_provider = "MetaAds"
         elif provider == "asa":
             ids_map = ASA_IDS
-            table_for_provider = os.getenv("BQ_ASA_TABLE")
+            table_for_provider = "AsaAds"
         else:
             ids_map = TIKTOK_IDS
-            table_for_provider = os.getenv("BQ_TIKTOK_TABLE")
+            table_for_provider = "TiktokAds"
 
         # Resolve app list for this provider
         if selected_apps_from_args is not None and len(selected_apps_from_args) > 0:

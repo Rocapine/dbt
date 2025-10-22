@@ -14,9 +14,7 @@ def fetch_daily_spend_by_country(ad_account_ids: Iterable[str],month_yyyy_mm: Op
     timeout_seconds: int = 30,
 ) -> List[DailyCountrySpendPerAdGroup]:
 
-    token = os.getenv("META_ACCESS_TOKEN", os.getenv("META_TOKEN", "")).strip()
-    if not token:
-        raise RuntimeError("META_ACCESS_TOKEN not configured in environment")
+    token = "EAAUKh5VZA6xgBPl45ALNAMJdMoX53w4tW60i2FwCnE2A20YmlD4ruuvJnuhM76rkvi8MyBDivE57v52guCZCvBqnpZAfZBO249wOoOAIlgqgpFtMlZBBuu3gow126AreW2s1wwOhMQYyCwqrMh0nDkavdlEqK60neojGc1I9AGxdbitwTyHkYlzxngTZCP"
 
     if start_date_str and end_date_str:
         start_date, end_date = start_date_str, end_date_str

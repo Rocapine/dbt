@@ -13,12 +13,27 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  ad-spend: 
+    runs-on: ubuntu-latest
+    env: 
+      GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Install Python dependencies for ad spend script
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r script_ad_spend/requirements.txt
+      
+      - name: Run ad spend script for yesterday's data
+        run: python script_ad_spend/main.py --to-bq
   build:
+    needs: [ad-spend]
     runs-on: ubuntu-latest
     env:
       GCP_PRIVATE_KEY_ID: ${{ secrets.GCP_PRIVATE_KEY_ID }}
       GCP_PRIVATE_KEY: ${{ secrets.GCP_PRIVATE_KEY }}
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4

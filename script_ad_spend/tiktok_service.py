@@ -62,9 +62,8 @@ def fetch_daily_spend_by_country_by_adgroup(
     - Aggregates across provided advertiser_ids
     - Returns raw spend values in the account currency reported by TikTok
     """
-    token = os.getenv("TIKTOK_TOKEN", "").strip()
-    if not token:
-        raise RuntimeError("TIKTOK_TOKEN not configured in environment")
+    token = "57ce2e64ea07ecb03836462d8322714ba925b523"
+
 
     if start_date_str and end_date_str:
         start_date, end_date = start_date_str, end_date_str
