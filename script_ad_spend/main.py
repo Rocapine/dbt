@@ -88,17 +88,17 @@ def main(argv: List[str]) -> int:
     channels = {
         "tiktok": {
             "ids_map": TIKTOK_IDS,
-            "table": "Intern",
+            "table": "TiktokAds",
             "fetch": tiktok_spend_by_country_by_adgroup,
         },
         "meta": {
             "ids_map": META_IDS,
-            "table": "Intern",
+            "table": "MetaAds",
             "fetch": meta_spend_by_country,
         },
         "asa": {
             "ids_map": ASA_IDS,
-            "table": "Intern",
+            "table": "AsaAds",
             "fetch": asa_spend_by_country_by_adgroup,
         },
     }
