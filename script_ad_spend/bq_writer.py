@@ -15,7 +15,6 @@ def _get_bq_client(credentials_file: Optional[str], project_id: Optional[str]) -
         creds = service_account.Credentials.from_service_account_file(credentials_file)
         project = project_id or getattr(creds, "project_id", None)
         return bigquery.Client(project=project, credentials=creds)
-    # Fallback to application default credentials (e.g., GOOGLE_APPLICATION_CREDENTIALS)
     log.info("BQ auth: using application default credentials; project=%s", project_id)
     return bigquery.Client(project=project_id)
 

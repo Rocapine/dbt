@@ -15,6 +15,9 @@ concurrency:
 jobs:
   ad-spend: 
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        channel: [tiktok, meta, asa]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -35,7 +38,7 @@ jobs:
           ASA_PRIVATE_KEY_PEM: ${{ secrets.PRIVATE_KEY_PEM }}
         run: |
           echo "GOOGLE_APPLICATION_CREDENTIALS=$GOOGLE_APPLICATION_CREDENTIALS"
-          stdbuf -oL -eL python -u script_ad_spend/main.py --to-bq
+          stdbuf -oL -eL python -u script_ad_spend/main.py --to-bq --channel ${{ matrix.channel }}
   build:
     needs: [ad-spend]
     runs-on: ubuntu-latest

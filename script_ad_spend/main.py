@@ -52,6 +52,23 @@ def main(argv: List[str]) -> int:
         TIKTOK_IDS = NEW_AD_ACCOUNT_TIKTOK_IDS
         META_IDS = NEW_AD_ACCOUNT_META_IDS
         ASA_IDS = NEW_AD_ACCOUNT_ASA_ORG_IDS
+
+    selected_channel: Optional[str] = None
+    if "--channel" in args:
+        idx = args.index("--channel")
+        try:
+            selected_channel = args[idx + 1]
+        except IndexError:
+            raise SystemExit("--channel requires a value: tiktok|meta|asa")
+        # remove flag and its value
+        del args[idx:idx + 2]
+    else:
+        # also support --channel=asa form
+        for i, a in enumerate(list(args)):
+            if a.startswith("--channel="):
+                selected_channel = a.split("=", 1)[1]
+                args.pop(i)
+                break
     def is_yyyy_mm_dd(s: str) -> bool:
         try:
             datetime.strptime(s, "%Y-%m-%d")
@@ -71,20 +88,25 @@ def main(argv: List[str]) -> int:
     channels = {
         "tiktok": {
             "ids_map": TIKTOK_IDS,
-            "table": "TiktokAds",
+            "table": "Intern",
             "fetch": tiktok_spend_by_country_by_adgroup,
         },
         "meta": {
             "ids_map": META_IDS,
-            "table": "MetaAds",
+            "table": "Intern",
             "fetch": meta_spend_by_country,
         },
         "asa": {
             "ids_map": ASA_IDS,
-            "table": "AsaAds",
+            "table": "Intern",
             "fetch": asa_spend_by_country_by_adgroup,
         },
     }
+
+    if selected_channel:
+        if selected_channel not in channels:
+            raise SystemExit(f"Unknown --channel '{selected_channel}'; choose from tiktok, meta, asa")
+        channels = {selected_channel: channels[selected_channel]}
 
     writer = None if to_bq else csv.writer(sys.stdout)
     if writer:
