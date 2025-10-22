@@ -51,20 +51,32 @@ def main(argv: List[str]) -> int:
         except Exception:
             return False
 
-    parsed_apps_start_idx = 0
     if len(args) >= 2 and is_yyyy_mm_dd(args[0]) and is_yyyy_mm_dd(args[1]):
         start_date_arg, end_date_arg = args[0], args[1]
-        parsed_apps_start_idx = 2
     else:
         # Default to yesterday (UTC) when dates are not supplied
         yesterday = (datetime.now(timezone.utc) - timedelta(days=1)).strftime("%Y-%m-%d")
         start_date_arg = yesterday
         end_date_arg = yesterday
 
-    # support selecting specific apps via CLI args after date inputs
-    selected_apps_from_args = set(args[parsed_apps_start_idx:]) if len(args) > parsed_apps_start_idx else None
 
-    providers_to_run: List[str] = ["tiktok", "meta", "asa"]
+    channels = {
+        "tiktok": {
+            "ids_map": TIKTOK_IDS,
+            "table": "TestJobs",
+            "fetch": tiktok_spend_by_country_by_adgroup,
+        },
+        "meta": {
+            "ids_map": META_IDS,
+            "table": "TestJobs",
+            "fetch": meta_spend_by_country,
+        },
+        "asa": {
+            "ids_map": ASA_IDS,
+            "table": "TestJobs",
+            "fetch": asa_spend_by_country_by_adgroup,
+        },
+    }
 
     writer = None if to_bq else csv.writer(sys.stdout)
     if writer:
@@ -80,32 +92,16 @@ def main(argv: List[str]) -> int:
             "adgroup_name",
         ])
 
-    # Run for each chosen provider
-    for provider in providers_to_run:
-        if provider == "meta":
-            ids_map = META_IDS
-            table_for_provider = "TestJob"
-        elif provider == "asa":
-            ids_map = ASA_IDS
-            table_for_provider = "TestJob"
-        else:
-            ids_map = TIKTOK_IDS
-            table_for_provider = "TestJob"
+    for chennel_name, cfg in channels.items():
+        ids_map = cfg["ids_map"]
+        table_for_channel = cfg["table"]
+        fetch_fn = cfg["fetch"]
 
-        # Resolve app list for this provider
-        if selected_apps_from_args is not None and len(selected_apps_from_args) > 0:
-            apps_for_provider = sorted(a for a in selected_apps_from_args if a in ids_map)
-        else:
-            apps_for_provider = sorted(ids_map.keys())
+        apps_for_provider = sorted(ids_map.keys())
 
         for app in apps_for_provider:
             ids = [ids_map.get(app, "")]
-            if provider == "meta":
-                rows_country = meta_spend_by_country(ids, start_date_str=start_date_arg, end_date_str=end_date_arg)
-            elif provider == "asa":
-                rows_country = asa_spend_by_country_by_adgroup(ids, start_date_str=start_date_arg, end_date_str=end_date_arg)
-            else:
-                rows_country = tiktok_spend_by_country_by_adgroup(ids, start_date_str=start_date_arg, end_date_str=end_date_arg)
+            rows_country = fetch_fn(ids, start_date_str=start_date_arg, end_date_str=end_date_arg)
 
             if to_bq:
                 # stream to BigQuery
@@ -128,7 +124,7 @@ def main(argv: List[str]) -> int:
                 write_rows_to_bigquery(
                     rows,
                     dataset=bq_dataset,
-                    table=table_for_provider,
+                    table=table_for_channel,
                     project_id=bq_project,
                     credentials_file=bq_credentials,
                 )
