@@ -15,7 +15,7 @@ from constant import (
 from tiktok_service import fetch_daily_spend_by_country_by_adgroup as tiktok_spend_by_country_by_adgroup
 from meta_service import fetch_daily_spend_by_country as meta_spend_by_country
 from asa_service import fetch_daily_spend_by_country_by_adgroup as asa_spend_by_country_by_adgroup
-from bq_writer import write_rows_to_bigquery
+from bq_writer import write_rows_to_bigquery, log_bq_connection_status
 
 
 def main(argv: List[str]) -> int:
@@ -35,6 +35,14 @@ def main(argv: List[str]) -> int:
     bq_dataset = "AdSpend"
     bq_project = "rocadata"
     bq_credentials = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
+    print("Credentials: ", bq_credentials)
+    Connectivity = log_bq_connection_status(
+        dataset=bq_dataset,
+        table="TestJobs",
+        project_id=bq_project,
+        credentials_file=bq_credentials,
+    )
+    print("Connectivity: ", Connectivity)
 
     if "--to-bq" in args:
         to_bq = True

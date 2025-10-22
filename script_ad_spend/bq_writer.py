@@ -9,7 +9,6 @@ from google.oauth2 import service_account
 
 def _get_bq_client(credentials_file: Optional[str], project_id: Optional[str]) -> bigquery.Client:
     """Create a BigQuery client using a service account file if provided.
-
     """
     if credentials_file and os.path.isfile(credentials_file):
         log.info("BQ auth: using service account file at %s", credentials_file)
@@ -19,6 +18,35 @@ def _get_bq_client(credentials_file: Optional[str], project_id: Optional[str]) -
     # Fallback to application default credentials (e.g., GOOGLE_APPLICATION_CREDENTIALS)
     log.info("BQ auth: using application default credentials; project=%s", project_id)
     return bigquery.Client(project=project_id)
+
+
+def log_bq_connection_status(
+    *,
+    dataset: str = "AdSpend",
+    table: str = "TestJob",
+    project_id: Optional[str] = None,
+    credentials_file: Optional[str] = None,
+) -> bool:
+    """Log whether BigQuery connectivity is OK and whether the table exists.
+
+    Returns True if we can reach BigQuery and the dataset exists (even if table is missing).
+    Returns False if we cannot authenticate or reach BigQuery.
+    """
+    try:
+        client = _get_bq_client(credentials_file, project_id)
+        full_table = f"{client.project}.{dataset}.{table}"
+        log.info("BQ connectivity: checking %s", full_table)
+        # Ensure dataset is reachable
+        client.get_dataset(dataset)
+        try:
+            client.get_table(full_table)
+            log.info("BQ connectivity OK: table exists (%s)", full_table)
+        except NotFound:
+            log.warning("BQ connectivity OK: dataset exists, table NOT found (%s)", full_table)
+        return True
+    except Exception as exc:
+        log.error("BQ connectivity FAILED: %s", exc)
+        return False
 
 
 def _ensure_table(client: bigquery.Client, dataset: str, table: str) -> bigquery.Table:
