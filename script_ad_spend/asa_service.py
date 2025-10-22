@@ -8,6 +8,7 @@ import requests
 
 # Reuse the shared result type for uniform downstream handling (BQ writer, CSV output)
 from tiktok_service import DailyCountrySpendPerAdGroup, _resolve_month_window
+from asa_auth import build_client_secret
 
 
 APPLE_ID_TOKEN_URL = "https://appleid.apple.com/auth/oauth2/token"
@@ -22,18 +23,22 @@ def _client_secret_path() -> str:
     return os.path.join(_script_dir(), "client_secret.txt")
 
 
-def _ensure_client_secret(*, python_executable: Optional[str] = None) -> str:
-    """Ensure a fresh client_secret.txt exists by invoking asa_auth.py.
-
-    Returns absolute path to client_secret.txt.
+def _ensure_client_secret() -> str:
+    """Ensure client_secret.txt exists using ASA_* env vars 
     """
     secret_path = _client_secret_path()
-    # Always regenerate to avoid expiry issues (JWT can live up to 180 days, but cheap to regenerate)
-    py = python_executable or os.getenv("PYTHON", "python3")
-    auth_script = os.path.join(_script_dir(), "asa_auth.py")
-    subprocess.run([py, auth_script], cwd=_script_dir(), check=True)
-    if not os.path.isfile(secret_path):
-        raise RuntimeError("Failed to generate Apple client secret (client_secret.txt not found)")
+    client_id = "SEARCHADS.249553e6-77cd-403e-92dc-2e9e3d4e7467"
+    team_id = "SEARCHADS.249553e6-77cd-403e-92dc-2e9e3d4e7467"
+    key_id = "b0366540-34e1-4639-845c-ef5928dfdf51"
+    private_key_pem = os.getenv("ASA_PRIVATE_KEY_PEM", "").strip()
+    if not all([client_id, team_id, key_id, private_key_pem]):
+        # Fall back to existing file if present; otherwise error clearly
+        if os.path.isfile(secret_path):
+            return secret_path
+        raise RuntimeError("Missing ASA_* env vars and client_secret.txt not present")
+    client_secret = build_client_secret(client_id, team_id, key_id, private_key_pem)
+    with open(secret_path, "w", encoding="utf-8") as f:
+        f.write(client_secret)
     return secret_path
 
 
@@ -53,12 +58,7 @@ def _get_access_token(*, client_id: Optional[str] = None, scope: str = "searchad
     with open(client_secret_file, "rt", encoding="utf-8") as f:
         client_secret = f.read().strip()
 
-    resolved_client_id = client_id or os.getenv("ASA_CLIENT_ID", "").strip()
-    if not resolved_client_id:
-        # Fallback to the value used by asa_auth.py if present there
-        # Note: asa_auth.py has client_id hardcoded
-        resolved_client_id = "SEARCHADS.249553e6-77cd-403e-92dc-2e9e3d4e7467"
-
+    resolved_client_id = "SEARCHADS.249553e6-77cd-403e-92dc-2e9e3d4e7467"
     headers = {
         "Content-Type": "application/x-www-form-urlencoded",
     }

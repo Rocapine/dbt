@@ -4,58 +4,42 @@ from authlib.jose import jwt
 from Crypto.PublicKey import ECC
 
 
-private_key_file = "private-key.pem"
-public_key_file = "public-key.pem"
-client_id = "SEARCHADS.249553e6-77cd-403e-92dc-2e9e3d4e7467"
-team_id = "SEARCHADS.249553e6-77cd-403e-92dc-2e9e3d4e7467"
-key_id = "b0366540-34e1-4639-845c-ef5928dfdf51"
-audience = "https://appleid.apple.com"
-alg = "ES256"
+AUDIENCE = "https://appleid.apple.com"
+ALG = "ES256"
 
-# Create the private key if it doesn't already exist.
-if os.path.isfile(private_key_file):
-    with open(private_key_file, "rt") as file:
-        private_key = ECC.import_key(file.read())
-else:
-    private_key = ECC.generate(curve='P-256')
-    with open(private_key_file, 'wt') as file:
-        file.write(private_key.export_key(format='PEM'))
 
-# Extract and save the public key.
-public_key = private_key.public_key()
-if not os.path.isfile(public_key_file):
-    with open(public_key_file, 'wt') as file:
-        file.write(public_key.export_key(format='PEM'))
+def build_client_secret(client_id: str, team_id: str, key_id: str, private_key_pem: str, *, expiration_seconds: int = 86400 * 180) -> str:
+    """Build an Apple Search Ads OAuth client_secret JWT using the provided key.
 
-# Define the issue timestamp.
-issued_at_timestamp = int(dt.datetime.now(dt.timezone.utc).timestamp())
-# Define the expiration timestamp, which may not exceed 180 days from the issue timestamp.
-expiration_timestamp = issued_at_timestamp + 86400*180
+    The private key MUST be the .p8 key issued by Apple for the given key_id and team_id.
+    """
+    issued_at_timestamp = int(dt.datetime.now(dt.timezone.utc).timestamp())
+    expiration_timestamp = issued_at_timestamp + expiration_seconds
 
-# Define the JWT headers.
-headers = dict()
-headers['alg'] = alg
-headers['kid'] = key_id
+    headers = {
+        "alg": ALG,
+        "kid": key_id,
+    }
+    payload = {
+        "sub": client_id,
+        "aud": AUDIENCE,
+        "iat": issued_at_timestamp,
+        "exp": expiration_timestamp,
+        "iss": team_id,
+    }
 
-# Define the JWT payload.
-payload = dict()
-payload['sub'] = client_id
-payload['aud'] = audience
-payload['iat'] = issued_at_timestamp
-payload['exp'] = expiration_timestamp
-payload['iss'] = team_id
+    private_key = ECC.import_key(private_key_pem)
+    client_secret = jwt.encode(header=headers, payload=payload, key=private_key.export_key(format='PEM')).decode("UTF-8")
+    return client_secret
 
-# Open the private key.
-with open(private_key_file, 'rt') as file:
-    private_key = ECC.import_key(file.read())
 
-# Encode the JWT and sign it with the private key.
-client_secret = jwt.encode(
-    header=headers,
-    payload=payload,
-    key=private_key.export_key(format='PEM')
-).decode('UTF-8')
-
-# Save the client secret to a file.
-with open('client_secret.txt', 'w') as output:
-     output.write(client_secret)
+if __name__ == "__main__":
+    client_id = "SEARCHADS.249553e6-77cd-403e-92dc-2e9e3d4e7467"
+    team_id = "SEARCHADS.249553e6-77cd-403e-92dc-2e9e3d4e7467"
+    key_id = "b0366540-34e1-4639-845c-ef5928dfdf51"
+    private_key_pem = os.getenv("ASA_PRIVATE_KEY_PEM", "").strip()
+    if not all([client_id, team_id, key_id, private_key_pem]):
+        raise SystemExit("Missing ASA_CLIENT_ID/ASA_TEAM_ID/ASA_KEY_ID/ASA_PRIVATE_KEY_PEM env vars")
+    cs = build_client_secret(client_id, team_id, key_id, private_key_pem)
+    with open("client_secret.txt", "w") as output:
+        output.write(cs)
