@@ -1,4 +1,5 @@
 import os
+import logging as log
 from typing import Iterable, List, Mapping, Optional
 
 from google.cloud import bigquery
@@ -11,10 +12,12 @@ def _get_bq_client(credentials_file: Optional[str], project_id: Optional[str]) -
 
     """
     if credentials_file and os.path.isfile(credentials_file):
+        log.info("BQ auth: using service account file at %s", credentials_file)
         creds = service_account.Credentials.from_service_account_file(credentials_file)
         project = project_id or getattr(creds, "project_id", None)
         return bigquery.Client(project=project, credentials=creds)
     # Fallback to application default credentials (e.g., GOOGLE_APPLICATION_CREDENTIALS)
+    log.info("BQ auth: using application default credentials; project=%s", project_id)
     return bigquery.Client(project=project_id)
 
 
@@ -24,6 +27,7 @@ def _ensure_table(client: bigquery.Client, dataset: str, table: str) -> bigquery
     try:
         # If table has no schema, we update the schema
         existing = client.get_table(table_ref)
+        log.info("BQ table exists: %s.%s.%s (fields=%d)", client.project, dataset, table, len(existing.schema))
 
         existing_fields = {f.name for f in existing.schema}
         desired_optional = [
@@ -42,6 +46,7 @@ def _ensure_table(client: bigquery.Client, dataset: str, table: str) -> bigquery
             new_schema = list(existing.schema) + to_add
             existing.schema = new_schema
             existing = client.update_table(existing, ["schema"])
+            log.info("BQ table schema extended: %s.%s.%s (+%d fields)", client.project, dataset, table, len(to_add))
         return existing
     except NotFound:
         schema = [
@@ -56,7 +61,9 @@ def _ensure_table(client: bigquery.Client, dataset: str, table: str) -> bigquery
             bigquery.SchemaField("Currency", "STRING", mode="NULLABLE"),
         ]
         table_obj = bigquery.Table(table_ref, schema=schema)
-        return client.create_table(table_obj)
+        created = client.create_table(table_obj)
+        log.info("BQ table created: %s.%s.%s", client.project, dataset, table)
+        return created
 
 
 def write_rows_to_bigquery(
@@ -69,28 +76,29 @@ def write_rows_to_bigquery(
     batch_size: int = 500,
 ) -> None:
     """Write rows to BigQuery table, creating it if it doesn't exist.
-
-    Required row keys (matching schema):
-    - Date (YYYY-MM-DD), Ad_Account, Country, Spend
-    Optional keys:
-    - Campaign_id, Campaign_name, Ad_id, Ad_name, Adgroup_id, Adgroup_name, Currency
     """
     client = _get_bq_client(credentials_file, project_id)
     _ensure_table(client, dataset, table)
 
     buffer: List[Mapping[str, object]] = []
+    total_inserted = 0
     for row in rows:
         buffer.append(row)
         if len(buffer) >= batch_size:
+            log.info("BQ insert batch: table=%s.%s.%s size=%d", client.project, dataset, table, len(buffer))
             errors = client.insert_rows_json(f"{client.project}.{dataset}.{table}", buffer)
             if errors:
                 # Raise the first error with context
                 raise RuntimeError(f"BigQuery insert failed: {errors}")
+            total_inserted += len(buffer)
             buffer.clear()
 
     if buffer:
+        log.info("BQ insert final batch: table=%s.%s.%s size=%d", client.project, dataset, table, len(buffer))
         errors = client.insert_rows_json(f"{client.project}.{dataset}.{table}", buffer)
         if errors:
             raise RuntimeError(f"BigQuery insert failed: {errors}")
+        total_inserted += len(buffer)
+    log.info("BQ insert done: table=%s.%s.%s total_rows=%d", client.project, dataset, table, total_inserted)
 
 
