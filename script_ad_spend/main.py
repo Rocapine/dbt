@@ -32,9 +32,6 @@ def main(argv: List[str]) -> int:
 
     # flags
     to_bq = False
-    use_meta = False
-    use_asa = False
-    use_tiktok = False
     bq_dataset = "AdSpend"
     bq_project = "rocadata"
     bq_credentials = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
@@ -47,15 +44,6 @@ def main(argv: List[str]) -> int:
         TIKTOK_IDS = NEW_AD_ACCOUNT_TIKTOK_IDS
         META_IDS = NEW_AD_ACCOUNT_META_IDS
         ASA_IDS = NEW_AD_ACCOUNT_ASA_ORG_IDS
-    if "--meta" in args:
-        use_meta = True
-        args = [a for a in args if a != "--meta"]
-    if "--asa" in args:
-        use_asa = True
-        args = [a for a in args if a != "--asa"]
-    if "--tiktok" in args:
-        use_tiktok = True
-        args = [a for a in args if a != "--tiktok"] 
     def is_yyyy_mm_dd(s: str) -> bool:
         try:
             datetime.strptime(s, "%Y-%m-%d")
@@ -76,16 +64,7 @@ def main(argv: List[str]) -> int:
     # support selecting specific apps via CLI args after date inputs
     selected_apps_from_args = set(args[parsed_apps_start_idx:]) if len(args) > parsed_apps_start_idx else None
 
-    # determine which providers to run; if none specified, run all
-    providers_to_run: List[str] = []
-    if use_meta:
-        providers_to_run.append("TestJob")
-    if use_asa:
-        providers_to_run.append("TestJob")
-    if use_tiktok:
-        providers_to_run.append("TestJob")
-    if not providers_to_run:
-        providers_to_run = ["TestJob", "TestJob", "TestJob"]
+    providers_to_run: List[str] = ["tiktok", "meta", "asa"]
 
     writer = None if to_bq else csv.writer(sys.stdout)
     if writer:
@@ -105,13 +84,13 @@ def main(argv: List[str]) -> int:
     for provider in providers_to_run:
         if provider == "meta":
             ids_map = META_IDS
-            table_for_provider = "MetaAds"
+            table_for_provider = "TestJob"
         elif provider == "asa":
             ids_map = ASA_IDS
-            table_for_provider = "AsaAds"
+            table_for_provider = "TestJob"
         else:
             ids_map = TIKTOK_IDS
-            table_for_provider = "TiktokAds"
+            table_for_provider = "TestJob"
 
         # Resolve app list for this provider
         if selected_apps_from_args is not None and len(selected_apps_from_args) > 0:
