@@ -13,7 +13,22 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  setup:
+    runs-on: ubuntu-latest
+    env: # 👈 Define environment variables here
+      BQ_TABLE: my_dataset.my_table
+      GCP_PRIVATE_KEY_ID: ${{ secrets.GCP_PRIVATE_KEY_ID }}
+      META_TOKEN: "sdkjqkldjqlkdjqljdqlkjdlqksjdqlksjkl"
+      GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Say hello
+        run: echo "Hello, world!"
+
   build:
+    needs: [setup]
     runs-on: ubuntu-latest
     env:
       GCP_PRIVATE_KEY_ID: ${{ secrets.GCP_PRIVATE_KEY_ID }}
