@@ -10,6 +10,7 @@ with asa as (
   adgroup_name,
   spend,
   currency,
+  'Apple Search Ads' as channel,
   'IOS' as platform,
   case 
     when upper(substr(campaign_name, 1, 3)) = 'HAR' then 'harmony'
@@ -29,6 +30,7 @@ meta as (
   adgroup_name,
   spend,
   currency,
+  'Meta' as channel,
   case 
     when upper(campaign_name) like '%IOS%' then 'IOS'
     when upper(campaign_name) like '%AND%' then 'Android'
@@ -60,6 +62,7 @@ tiktok as (
   adgroup_name,
   spend,
   currency,
+  'Tiktok' as channel,
   case 
   when upper(campaign_name) like '%IOS%' then 'IOS'
   when upper(campaign_name) like '%AND%' then 'Android'
@@ -88,6 +91,7 @@ source as (
 
 select 
 date as date,
+channel as channel,
 country as country,
 ad_account as ad_account,
 platform as platform,
