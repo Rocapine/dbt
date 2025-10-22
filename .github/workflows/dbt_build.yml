@@ -30,7 +30,15 @@ jobs:
           pip install -r script_ad_spend/requirements.txt
       
       - name: Run ad spend script for yesterday's data
-        run: python script_ad_spend/main.py --to-bq
+        env:
+          PYTHONUNBUFFERED: "1"
+        run: |
+          echo "PWD=$(pwd)"
+          ls -la
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$GOOGLE_APPLICATION_CREDENTIALS"
+          test -f "$GOOGLE_APPLICATION_CREDENTIALS" && echo "GCP key present ✅" || (echo "Missing GCP key ❌" && exit 1)
+          # Stream stdout/stderr line-by-line
+          stdbuf -oL -eL python -u script_ad_spend/main.py --to-bq
   build:
     needs: [ad-spend]
     runs-on: ubuntu-latest
