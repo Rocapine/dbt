@@ -13,7 +13,7 @@ with asa as (
   'Apple Search Ads' as channel,
   'IOS' as platform,
   case 
-    when upper(substr(campaign_name, 1, 3)) = 'HAR' then 'harmony'
+    when upper(substr(campaign_name, 1, 3)) = 'HAR' then 'Harmony'
     when upper(substr(campaign_name, 1, 3)) = 'CBT' then 'CBT'
     else ad_account
   end as ad_account
@@ -34,20 +34,19 @@ meta as (
   case 
     when upper(campaign_name) like '%IOS%' then 'IOS'
     when upper(campaign_name) like '%AND%' then 'Android'
-    else null
+    else 'Unknown'
   end as platform,
   case 
-  when campaign_name like '%Lifestyle_web%' then 'Harmony'
-  when campaign_name like '%Roca_Unchaind%'  then 'Unchained'
-  when campaign_name like '%Unchaind (SGD)%' then 'Unchained'
-  when campaign_name like '%Stashcook Ads%' then 'Stashcook'
-  when campaign_name like '%Push Training%' then 'Pushtraining'
-  when campaign_name like '%Propel (iOS)%' then 'Propel'
-  when campaign_name like '%Propel (Android)%' then 'Propel'
-  when campaign_name like '%Teech_ADS%' then 'Teech'
-  when campaign_name like '%Eve:_Pre_&_Post_Natal_Yoga%' then 'Eve'
-  when campaign_name like '%Lifestyle_Web%' then 'Lifestyle'
-    else ad_account
+  when ad_account = 'Lifestyle Web' then 'Harmony'
+  when ad_account = 'Roca_Unchaind' then 'Unchained'
+  when ad_account = 'Unchaind (SGD)' then 'Unchained'
+  when ad_account = 'Stashcook Ads' then 'Stashcook'
+  when ad_account = 'Push Training' then 'Pushtraining'
+  when ad_account = 'Propel (iOS)' then 'Propel'
+  when ad_account = 'Propel (Android)' then 'Propel'
+  when ad_account = 'Teech ADS' then 'Teech'
+  when ad_account = 'Eve: Pre & Post Natal Yoga' then 'Eve'
+    else 'Unknown'
   end as ad_account
   from {{ source('ads', 'MetaAds') }}
 ),
@@ -69,13 +68,13 @@ tiktok as (
   else null
   end as platform,
   case 
-  when campaign_name like '%[Android/iOS] Stashcook%' then 'Stashcook'
-  when campaign_name like '%[iOS] Pushtraining%' then 'Pushtraining'
-  when campaign_name like '%[IOS] Unchained%' then 'Unchained'
-  when campaign_name like '%(Android) Unchained%' then 'Unchained'
-  when campaign_name like '%[iOS] FitFlow%' then 'FitFlow'
-  when campaign_name like '%Propel (iOS)%' then 'Propel'
-  when campaign_name like '%[iOS] Harmony%' then 'Harmony'
+  when ad_account like '%[Android/iOS] Stashcook%' then 'Stashcook'
+  when ad_account like '%[iOS] Pushtraining%' then 'Pushtraining'
+  when ad_account like '%[IOS] Unchained%' then 'Unchained'
+  when ad_account like '%(Android) Unchained%' then 'Unchained'
+  when ad_account like '%[iOS] FitFlow%' then 'FitFlow'
+  when ad_account like '%Propel (iOS)%' then 'Propel'
+  when ad_account like '%[iOS] Harmony%' then 'Harmony'
   else 'Unknown'
   end as ad_account
   from {{ source('ads', 'TiktokAds') }}
