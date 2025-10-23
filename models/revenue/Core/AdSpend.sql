@@ -8,8 +8,9 @@ with asa as (
   campaign_name,
   adgroup_id,
   adgroup_name,
-  spend,
+  spend as spend_in_currency,
   currency,
+  1.00 * spend as spend_in_usd,
   'Apple Search Ads' as channel,
   'IOS' as platform,
   case 
@@ -28,8 +29,14 @@ meta as (
   campaign_name,
   adgroup_id,
   adgroup_name,
-  spend,
+  spend as spend_in_currency,
   currency,
+  case 
+  when currency = 'USD' then spend
+  when currency = 'EUR' then spend * 1.16
+  when currency = 'GBP' then spend * 1.33
+  else null
+  end as spend_in_usd,
   'Meta' as channel,
   case 
     when upper(campaign_name) like '%IOS%' then 'IOS'
@@ -59,8 +66,9 @@ tiktok as (
   campaign_name,
   adgroup_id,
   adgroup_name,
-  spend,
+  spend as spend_in_currency,
   currency,
+  1.16 * spend as spend_in_usd,
   'Tiktok' as channel,
   case 
   when upper(campaign_name) like '%IOS%' then 'IOS'
@@ -98,6 +106,7 @@ campaign_id as campaign_id,
 campaign_name as campaign_name,
 adgroup_id as adgroup_id,
 adgroup_name as adgroup_name,
-spend as spend,
+spend_in_currency as spend_in_currency,
 currency as currency,
+spend_in_usd as spend_in_usd,
 from source
