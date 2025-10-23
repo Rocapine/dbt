@@ -30,4 +30,13 @@ clean-targets:         # directories to be removed by `dbt clean`
 # directory as views. These settings can be overridden in the individual model
 # files using the `{{ config(...) }}` macro.
 models:
-    datawarehouse: {}
+    datawarehouse:
+      revenue:
+        Core:
+          +schema: Core
+        AppStoreConnect:
+          +schema: AppStoreConnect
+        experimental:
+          +schema: experimental
+        GooglePlay:
+          +schema: GooglePlay

@@ -1,4 +1,4 @@
-{{ config(materialized='table', schema='Core') }}
+{{ config(materialized='table', alias='Transactions') }}
 
 with source as (
   select * from {{ source('asc', 'Notification') }}
