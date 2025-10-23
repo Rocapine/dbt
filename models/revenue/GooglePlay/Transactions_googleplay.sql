@@ -60,6 +60,7 @@ select
   max(case when trials.base_order_id is not null then true else false end) as has_started_trial,
   max(case when converted.base_order_id is not null then true else false end) as has_converted_trial,
   max(case when direct_purchases.base_order_id is not null then true else false end) as has_direct_purchase,
+  max(case when converted.base_order_id is not null or direct_purchases.base_order_id is not null then true else false end) as has_paid,
   any_value(normalized_orders.regionCode) as country,
   any_value(normalized_orders.product_id) as product_id,
   any_value(normalized_orders.packageName) as bundle_id,
