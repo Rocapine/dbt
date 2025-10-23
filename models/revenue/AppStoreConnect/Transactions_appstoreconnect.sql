@@ -179,7 +179,6 @@ select
   max(case when trials.originalTransactionId is not null then true else false end) as has_started_trial,
   max(case when converted.originalTransactionId is not null then true else false end) as has_converted_trial,
   max(case when trials.originalTransactionId is null then true else false end) as has_direct_purchase,
-  max(case when converted.originalTransactionId is not null or trials.originalTransactionId is null then true else false end) as has_paid,
   any_value(normalized_source.country_2) as country,
   any_value(latest_product.product_id) as product_id,
   any_value(source.bundleId) as bundle_id,
