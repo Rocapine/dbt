@@ -20,10 +20,7 @@ converted as (
   join trials using (originalTransactionId)
   group by source.originalTransactionId
   HAVING 
-  (countif(source.NotificationType='DID_RENEW') > 0 
-  AND countif(source.NotificationType='REFUND') = 0) 
-  OR (countif(source.SubType='RESUBSCRIBE') > 0)
-  OR (countif(source.Subtype = 'UPGRADE') > 0)
+  (countif(source.NotificationType='DID_RENEW') > 0)
 ),
 expired as (
   select distinct source.originalTransactionId

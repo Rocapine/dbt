@@ -15,10 +15,11 @@ with asa as (
   'IOS' as platform,
   case 
     when upper(substr(campaign_name, 1, 3)) = 'HAR' then 'Harmony'
-    when upper(substr(campaign_name, 1, 3)) = 'CBT' then 'CBT'
-    else ad_account
+    else 'Unknown'
   end as ad_account
   from {{ source('ads', 'AsaAds') }}
+  where
+  upper(substr(campaign_name, 1, 3)) = 'HAR'
 ),
 
 meta as (
@@ -49,13 +50,15 @@ meta as (
   when ad_account = 'Unchaind (SGD)' then 'Unchained'
   when ad_account = 'Stashcook Ads' then 'Stashcook'
   when ad_account = 'Push Training' then 'Pushtraining'
-  when ad_account = 'Propel (iOS)' then 'Propel'
-  when ad_account = 'Propel (Android)' then 'Propel'
-  when ad_account = 'Teech ADS' then 'Teech'
-  when ad_account = 'Eve: Pre & Post Natal Yoga' then 'Eve'
     else 'Unknown'
   end as ad_account
   from {{ source('ads', 'MetaAds') }}
+  where
+  ad_account like '%Stashcook Ads%'
+  or ad_account like '%Push Training%'
+  or ad_account like '%Roca_Unchaind%'
+  or ad_account like '%Unchaind (SGD)%'
+  or ad_account like '%Lifestyle Web%'
 ),
 
 tiktok as (
@@ -80,12 +83,16 @@ tiktok as (
   when ad_account like '%[iOS] Pushtraining%' then 'Pushtraining'
   when ad_account like '%[IOS] Unchained%' then 'Unchained'
   when ad_account like '%(Android) Unchained%' then 'Unchained'
-  when ad_account like '%[iOS] FitFlow%' then 'FitFlow'
-  when ad_account like '%Propel (iOS)%' then 'Propel'
   when ad_account like '%[iOS] Harmony%' then 'Harmony'
   else 'Unknown'
   end as ad_account
   from {{ source('ads', 'TiktokAds') }}
+  where
+  ad_account like '%[Android/iOS] Stashcook%'
+  or ad_account like '%[iOS] Pushtraining%'
+  or ad_account like '%[IOS] Unchained%'
+  or ad_account like '%(Android) Unchained%'
+  or ad_account like '%[iOS] Harmony%'
 ),
 
 source as (
