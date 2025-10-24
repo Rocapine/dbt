@@ -205,4 +205,10 @@ left join normalized_source using (originalTransactionId)
 left join products_norm products
   on lower(trim(normalized_source.country_2)) = lower(trim(products.country_2))
   and products.product_SKU = latest_product.product_id
+  where source.bundleId in (
+  'com.rocapine.harmony',
+  'com.applostudio.Unchaind',
+  'com.stashbox.stashcook',
+  'com.albernackee.blur'
+)
 group by source.originalTransactionId

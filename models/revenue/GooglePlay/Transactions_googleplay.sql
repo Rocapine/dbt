@@ -133,5 +133,6 @@ left join products
   and normalized_orders.product_id = products.product_SKU
 
 group by normalized_orders.base_order_id
+having app_name in ('Harmony','Unchained','Stashcook','Pushtraining')
 
 
