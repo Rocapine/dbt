@@ -12,7 +12,7 @@ with asa as (
   currency,
   1.00 * spend as spend_in_usd,
   'Apple Search Ads' as channel,
-  'IOS' as platform,
+  'iOS' as platform,
   case 
     when upper(substr(campaign_name, 1, 3)) = 'HAR' then 'Harmony'
     else 'Unknown'
@@ -40,9 +40,9 @@ meta as (
   end as spend_in_usd,
   'Meta' as channel,
   case 
-    when upper(campaign_name) like '%IOS%' then 'IOS'
+    when upper(campaign_name) like '%IOS%' then 'iOS'
     when upper(campaign_name) like '%AND%' then 'Android'
-    else 'Unknown'
+    else 'iOS'
   end as platform,
   case 
   when ad_account = 'Lifestyle Web' then 'Harmony'
@@ -74,9 +74,9 @@ tiktok as (
   1.16 * spend as spend_in_usd,
   'Tiktok' as channel,
   case 
-  when upper(campaign_name) like '%IOS%' then 'IOS'
+  when upper(campaign_name) like '%IOS%' then 'iOS'
   when upper(campaign_name) like '%AND%' then 'Android'
-  else null
+  else 'iOS'
   end as platform,
   case 
   when ad_account like '%[Android/iOS] Stashcook%' then 'Stashcook'
